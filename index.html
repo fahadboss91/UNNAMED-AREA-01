@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UNNAMED AREA — Official</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --black: #0a0a0a;
@@ -415,34 +416,45 @@ footer { border-top:1px solid rgba(240,237,230,.07); padding:64px 56px; display:
 </section>
 
 <script>
-// POLL
-const pollItems = [
-  { label: 'Jogging Flare', votes: 0 },
-  { label: 'Pull', votes: 0 },
-  { label: 'T-shirt Oversize', votes: 0 },
-  { label: 'Ensemble', votes: 0 },
-  { label: 'Short', votes: 0 },
-];
-const voted = new Set();
+// ── SUPABASE CONFIG ──────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://uoduxocnhnoduxhjlnza.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZHV4b2NuaG5vZHV4aGpsbnphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE3MzAzNDEsImV4cCI6MjA1NzMwNjM0MX0.H6eqBSQ0FxcGxTlqp_h1gqL4DRqJPvAq7DFB5QOJNUQ';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── POLL ─────────────────────────────────────────────────────────────────────
+const POLL_OPTIONS = ['Jogging Flare', 'Pull', 'T-shirt Oversize', 'Ensemble', 'Short'];
+const voted = new Set(JSON.parse(localStorage.getItem('ua_voted') || '[]'));
+let pollCounts = {};
+
+async function loadPoll() {
+  const { data, error } = await db.from('votes').select('option');
+  if (error) { console.error(error); return; }
+  pollCounts = {};
+  POLL_OPTIONS.forEach(o => pollCounts[o] = 0);
+  data.forEach(row => { if (pollCounts[row.option] !== undefined) pollCounts[row.option]++; });
+  renderPoll();
+}
 
 function renderPoll() {
   const container = document.getElementById('poll');
-  const total = pollItems.reduce((s, i) => s + i.votes, 0);
-  container.innerHTML = pollItems.map((item, idx) => {
-    const pct = total > 0 ? Math.round((item.votes / total) * 100) : 0;
-    const isVoted = voted.has(idx);
+  if (!container) return;
+  const total = Object.values(pollCounts).reduce((s, v) => s + v, 0);
+  container.innerHTML = POLL_OPTIONS.map((label) => {
+    const count = pollCounts[label] || 0;
+    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+    const isVoted = voted.has(label);
     return `
-      <div onclick="vote(${idx})" style="cursor:pointer; border:1px solid ${isVoted ? 'rgba(107,124,82,.6)' : 'rgba(240,237,230,.1)'}; padding:18px 22px; transition:all .3s; background:${isVoted ? 'rgba(107,124,82,.08)' : 'transparent'}; position:relative; overflow:hidden;">
+      <div onclick="vote('${label}')" style="cursor:pointer; border:1px solid ${isVoted ? 'rgba(107,124,82,.6)' : 'rgba(240,237,230,.1)'}; padding:18px 22px; transition:all .3s; background:${isVoted ? 'rgba(107,124,82,.08)' : 'transparent'}; position:relative; overflow:hidden;">
         <div style="position:absolute; left:0; top:0; bottom:0; width:${pct}%; background:rgba(107,124,82,.12); transition:width .5s ease;"></div>
         <div style="position:relative; display:flex; align-items:center; justify-content:space-between; gap:16px;">
           <div style="display:flex; align-items:center; gap:14px;">
             <div style="width:18px; height:18px; border:1px solid ${isVoted ? '#6b7c52' : 'rgba(240,237,230,.25)'}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
               ${isVoted ? '<div style="width:10px;height:10px;background:#6b7c52;"></div>' : ''}
             </div>
-            <span style="font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:600; letter-spacing:2px; text-transform:uppercase;">${item.label}</span>
+            <span style="font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:600; letter-spacing:2px; text-transform:uppercase;">${label}</span>
           </div>
           <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
-            <span style="font-family:'Space Mono',monospace; font-size:11px; color:#6b7c52;">${item.votes} vote${item.votes !== 1 ? 's' : ''}</span>
+            <span style="font-family:'Space Mono',monospace; font-size:11px; color:#6b7c52;">${count} vote${count !== 1 ? 's' : ''}</span>
             <span style="font-family:'Space Mono',monospace; font-size:10px; color:rgba(240,237,230,.3);">${pct}%</span>
           </div>
         </div>
@@ -450,34 +462,74 @@ function renderPoll() {
   }).join('');
 }
 
-function vote(idx) {
-  if (voted.has(idx)) {
-    voted.delete(idx);
-    pollItems[idx].votes = Math.max(0, pollItems[idx].votes - 1);
+async function vote(option) {
+  if (voted.has(option)) {
+    // Retirer le vote
+    voted.delete(option);
+    localStorage.setItem('ua_voted', JSON.stringify([...voted]));
+    if (pollCounts[option] > 0) pollCounts[option]--;
+    renderPoll();
+    // Supprimer un vote côté serveur (approximatif : supprime un vote de cette option)
+    const { data } = await db.from('votes').select('id').eq('option', option).limit(1);
+    if (data && data.length > 0) await db.from('votes').delete().eq('id', data[0].id);
   } else {
-    voted.add(idx);
-    pollItems[idx].votes++;
+    // Ajouter le vote
+    voted.add(option);
+    localStorage.setItem('ua_voted', JSON.stringify([...voted]));
+    pollCounts[option] = (pollCounts[option] || 0) + 1;
+    renderPoll();
+    await db.from('votes').insert({ option });
   }
-  renderPoll();
 }
 
-renderPoll();
+// Temps réel : écoute les changements de votes
+db.channel('votes-channel')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, () => loadPoll())
+  .subscribe();
 
-// CONTEST
-function submitContest() {
-  const name = document.getElementById('gc-name').value.trim();
+loadPoll();
+
+// ── CONTEST ──────────────────────────────────────────────────────────────────
+async function submitContest() {
+  const prenom = document.getElementById('gc-name').value.trim();
   const insta = document.getElementById('gc-insta').value.trim();
   const tiktok = document.getElementById('gc-tiktok').value.trim();
   const confirm = document.getElementById('gc-confirm').checked;
   const jersey = document.querySelector('input[name="jersey"]:checked');
 
-  if (!name || !insta || !tiktok || !confirm || !jersey) {
+  if (!prenom || !insta || !tiktok || !confirm || !jersey) {
     alert('Merci de remplir tous les champs et de confirmer les conditions.');
     return;
   }
 
-  document.getElementById('gc-success').style.display = 'block';
-  document.querySelector('button[onclick="submitContest()"]').style.display = 'none';
+  const btn = document.querySelector('button[onclick="submitContest()"]');
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  // On utilise l'email fictif basé sur le compte insta pour l'unicité
+  const email = `${insta.replace('@','').toLowerCase()}@contest.unnamed-area`;
+
+  const { error } = await db.from('membres').insert({
+    prenom,
+    nom: tiktok, // on stocke le tiktok dans le champ nom pour le concours
+    email,
+    telephone: jersey.value,
+    password_hash: 'contest-' + Date.now()
+  });
+
+  if (error && error.code === '23505') {
+    // Doublon — participation déjà enregistrée
+    document.getElementById('gc-success').style.display = 'block';
+    document.getElementById('gc-success').textContent = '✓ Participation déjà enregistrée — on t\'a !';
+    btn.style.display = 'none';
+  } else if (error) {
+    btn.textContent = 'Erreur — Réessayer';
+    btn.disabled = false;
+    console.error(error);
+  } else {
+    document.getElementById('gc-success').style.display = 'block';
+    btn.style.display = 'none';
+  }
 }
 </script>
 
