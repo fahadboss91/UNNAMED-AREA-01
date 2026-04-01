@@ -64,20 +64,21 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; display:flex; align-
 .link-all:hover { color:var(--white); }
 .products-grid { display:grid; grid-template-columns:1.5fr 0.75fr 0.75fr; gap:3px; }
 .product-featured { position:relative; overflow:hidden; aspect-ratio:3/4; background:var(--grey); cursor:pointer; }
-.product-featured img { width:100%; height:100%; object-fit:cover; object-position:top; transition:transform .8s; }
-.product-featured:hover img { transform:scale(1.05); }
+.product-featured img { width:100%; height:100%; object-fit:cover; object-position:top; transition:transform .8s; filter:blur(4px); transform:scale(1.05); }
+.product-featured:hover img { transform:scale(1.08); }
+.product-featured::before { content:'COMING SOON'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; font-family:'Bebas Neue',sans-serif; font-size:clamp(24px,3vw,42px); letter-spacing:8px; color:var(--white); text-align:center; background:rgba(10,10,10,0.55); padding:18px 36px; border:1px solid rgba(240,237,230,0.25); pointer-events:none; }
 .product-side { display:flex; flex-direction:column; gap:3px; }
 .product-card { position:relative; overflow:hidden; flex:1; background:var(--grey); cursor:pointer; min-height:220px; }
-.product-card img { width:100%; height:100%; object-fit:cover; object-position:top; transition:transform .7s; }
-.product-card:hover img { transform:scale(1.05); }
+.product-card img { width:100%; height:100%; object-fit:cover; object-position:top; transition:transform .7s; filter:blur(4px); transform:scale(1.05); }
+.product-card:hover img { transform:scale(1.08); }
+.product-card::before { content:'COMING SOON'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; font-family:'Bebas Neue',sans-serif; font-size:clamp(14px,2vw,22px); letter-spacing:5px; color:var(--white); text-align:center; background:rgba(10,10,10,0.55); padding:12px 22px; border:1px solid rgba(240,237,230,0.25); pointer-events:none; white-space:nowrap; }
 .prod-info { position:absolute; bottom:0; left:0; right:0; padding:24px; background:linear-gradient(to top, rgba(10,10,10,.95) 0%, transparent 100%); }
 .prod-badge { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:2px; background:var(--camo); color:var(--white); padding:4px 10px; text-transform:uppercase; display:inline-block; margin-bottom:8px; }
 .prod-name { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; margin-bottom:4px; }
-.prod-row { display:flex; align-items:center; justify-content:space-between; margin-top:8px; }
-.prod-price { font-family:'Space Mono',monospace; font-size:12px; color:var(--muted); }
-.prod-soon { font-family:'Space Mono',monospace; font-size:8px; color:rgba(240,237,230,.25); letter-spacing:2px; }
-.prod-btn { width:100%; margin-top:14px; background:var(--white); color:var(--black); border:none; padding:13px; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:3px; text-transform:uppercase; cursor:pointer; font-weight:700; transition:all .3s; }
-.prod-btn:hover { background:var(--camo); color:var(--white); }
+.prod-row { display:none; }
+.prod-price { display:none; }
+.prod-soon { display:none; }
+.prod-btn { display:none; }
 
 .manifesto { padding:140px 56px; display:grid; grid-template-columns:1fr 1fr; gap:120px; align-items:center; border-top:1px solid rgba(240,237,230,.05); }
 .manifesto-visual { position:relative; height:620px; overflow:hidden; }
@@ -94,9 +95,9 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; display:flex; align-
 .lb-scroll { display:flex; gap:3px; overflow-x:auto; padding:0 56px 20px; scrollbar-width:thin; scrollbar-color:var(--camo) rgba(240,237,230,.05); }
 .lb-item { flex:0 0 320px; height:460px; overflow:hidden; position:relative; background:var(--grey); }
 .lb-item.wide { flex:0 0 500px; }
-.lb-item img { width:100%; height:100%; object-fit:cover; object-position:top; transition:transform .6s; }
-.lb-item:hover img { transform:scale(1.04); }
-.lb-overlay { position:absolute; bottom:0; left:0; right:0; padding:24px; background:linear-gradient(to top, rgba(10,10,10,.85) 0%, transparent 100%); opacity:0; transition:opacity .35s; }
+.lb-item img { width:100%; height:100%; object-fit:cover; object-position:top; transition:transform .6s; filter:blur(4px); transform:scale(1.05); }
+.lb-item:hover img { transform:scale(1.08); }
+.lb-item::before { content:'COMING SOON'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10; font-family:'Bebas Neue',sans-serif; font-size:clamp(16px,2.5vw,30px); letter-spacing:6px; color:var(--white); text-align:center; background:rgba(10,10,10,0.55); padding:14px 28px; border:1px solid rgba(240,237,230,0.25); pointer-events:none; white-space:nowrap; }
 .lb-item:hover .lb-overlay { opacity:1; }
 .lb-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
 
@@ -124,8 +125,14 @@ footer { border-top:1px solid rgba(240,237,230,.07); padding:64px 56px; display:
 .ft-bottom { grid-column:1/-1; padding-top:36px; border-top:1px solid rgba(240,237,230,.06); display:flex; justify-content:space-between; align-items:center; }
 .ft-copy { font-family:'Space Mono',monospace; font-size:8px; color:rgba(240,237,230,.18); letter-spacing:2px; }
 .ft-socials { display:flex; gap:22px; }
-.ft-socials a { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:2px; color:rgba(240,237,230,.28); text-decoration:none; text-transform:uppercase; transition:color .3s; }
+.ft-socials a { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:2px; color:rgba(240,237,230,.28); text-decoration:none; text-transform:uppercase; transition:color .3s; display:flex; align-items:center; gap:6px; }
 .ft-socials a:hover { color:var(--white); }
+.ft-socials svg { width:13px; height:13px; fill:currentColor; }
+
+.nav-social { display:flex; align-items:center; gap:16px; margin-right:24px; }
+.nav-social a { color:rgba(240,237,230,.4); text-decoration:none; transition:color .3s; display:flex; align-items:center; }
+.nav-social a:hover { color:var(--white); }
+.nav-social svg { width:15px; height:15px; fill:currentColor; }
 
 .reveal { opacity:0; transform:translateY(40px); transition:opacity .9s ease, transform .9s ease; }
 .reveal.in { opacity:1; transform:translateY(0); }
@@ -158,6 +165,14 @@ footer { border-top:1px solid rgba(240,237,230,.07); padding:64px 56px; display:
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a href="#collection" class="nav-cta">Drop 01</a>
+  <div class="nav-social">
+    <a href="https://www.instagram.com/unnamed_area08" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@unnamedarea08" target="_blank" rel="noopener" aria-label="TikTok">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.73a4.85 4.85 0 0 1-1.01-.04z"/></svg>
+    </a>
+  </div>
 </nav>
 
 <section class="hero">
@@ -197,11 +212,7 @@ footer { border-top:1px solid rgba(240,237,230,.07); padding:64px 56px; display:
       <div class="prod-info">
         <div class="prod-badge">Édition limitée</div>
         <div class="prod-name">Jersey 08 — Blanc</div>
-        <div class="prod-row">
-          <span class="prod-price">45 €</span>
-          <span class="prod-soon">BIENTÔT</span>
-        </div>
-        <button class="prod-btn">Être notifié</button>
+
       </div>
     </div>
     <div class="product-card">
@@ -593,8 +604,14 @@ function submitContest() {
   <div class="ft-bottom">
     <span class="ft-copy">© 2027 UNNAMED AREA — Tous droits réservés</span>
     <div class="ft-socials">
-      <a href="#">Instagram</a>
-      <a href="#">TikTok</a>
+      <a href="https://www.instagram.com/unnamed_area08" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        Instagram
+      </a>
+      <a href="https://www.tiktok.com/@unnamedarea08" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.73a4.85 4.85 0 0 1-1.01-.04z"/></svg>
+        TikTok
+      </a>
       <a href="#">Pinterest</a>
     </div>
   </div>
